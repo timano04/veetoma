@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #1b3322;
+  --foreground: #ffffff;
+  --primary: #ffd479;
+  --primary-foreground: #1f3a27;
+  --muted-foreground: rgba(255, 255, 255, 0.72);
+  --success: #4ade80;
+  --ring: #ffe29a;
+}
+
+body {
+  color: var(--foreground);
+  background-color: #1b3322;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ---------- Background Animations (Hardware-Accelerated) ---------- */
+@keyframes bgPanMotion {
+  0%, 100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.05) translate3d(-1.5%, 0, 0);
+  }
+}
+
+.bg-animated-pan {
+  animation: bgPanMotion 45s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate3d(0, 40px, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(24px, -105vh, 0);
+    opacity: 0;
+  }
+}
+
+.particle-pollen {
+  animation-name: particleFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* ---------- Glass Card Effect (Optimized 60fps) ---------- */
+.glass-card {
+  --bg-color: rgba(255, 255, 255, 0.12);
+  --highlight: rgba(255, 255, 255, 0.65);
+  --text: #ffffff;
+
+  position: relative;
+  border-radius: 28px;
+  overflow: hidden;
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.32),
+    0 0 60px rgba(255, 224, 150, 0.08),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateZ(0);
+  contain: layout style;
+}
+
+.glass-filter,
+.glass-overlay,
+.glass-specular {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.glass-filter {
+  z-index: 1;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-overlay {
+  z-index: 2;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
+    rgba(14, 34, 20, 0.25);
+}
+
+.glass-specular {
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 1px 1px 1px var(--highlight);
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.glass-content {
+  position: relative;
+  z-index: 4;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+}
+
+/* ---------- Lightweight glass for nested surfaces ---------- */
+.glass-panel {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05)),
+    rgba(12, 30, 18, 0.2);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.32),
+    0 8px 28px rgba(0, 0, 0, 0.16);
+}
+
+.glass-panel-soft {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.glass-interactive {
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
+.glass-interactive:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+.glow-gold {
+  box-shadow:
+    0 0 0 1px rgba(255, 230, 160, 0.55),
+    0 0 28px rgba(255, 214, 130, 0.45),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+.glass-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.glass-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+}
+.glass-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- Range input (seek, volume, faders) ---------- */
+.range {
+  --pct: 0%;
+  --fill: rgba(255, 255, 255, 0.95);
+  --track: rgba(255, 255, 255, 0.28);
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.range:focus-visible {
+  outline: none;
+}
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--fill) var(--pct), var(--track) var(--pct));
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(255, 244, 200, 0.7);
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+.range:hover::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.4),
+    0 0 0 5px rgba(255, 255, 255, 0.18),
+    0 0 14px rgba(255, 244, 200, 0.9);
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.4),
+    0 0 0 5px var(--ring);
+}
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--track);
+}
+.range::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--fill);
+}
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255, 244, 200, 0.7);
+}
+.range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+/* ---------- Equalizer bars ---------- */
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.eq-bar {
+  transform-origin: bottom;
+  transform: scaleY(0.3);
+}
+.eq-playing .eq-bar {
+  animation: eq 900ms ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%);
+  animation: shimmer 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-playing .eq-bar,
+  .glass-distortion-overlay,
+  .shimmer::after {
+    animation: none;
+  }
+}

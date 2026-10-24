@@ -1,0 +1,437 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Veetoma Music Stem Studio Core API",
+    "version": "1.0.0",
+    "description": "Core API contract for Veetoma Music Stem Studio managing audio stem separation jobs."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/jobs": {
+      "get": {
+        "summary": "List all audio jobs",
+        "description": "Returns a list of all audio processing jobs ordered by creation date descending.",
+        "responses": {
+          "200": {
+            "description": "List of audio jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AudioJobResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new audio separation job",
+        "description": "Enqueues a new audio separation job with QUEUED status.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Audio job created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioJobResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/upload": {
+      "post": {
+        "summary": "Upload audio file and create job",
+        "description": "Uploads an MP3 or WAV audio file and enqueues the separation job.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "autoSimulate": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job created from uploaded file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioJobResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{id}": {
+      "get": {
+        "summary": "Get audio job details by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audio job details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioJobResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        }
+      }
+    },
+    "/api/jobs/{id}/status": {
+      "patch": {
+        "summary": "Update audio job status and stem URLs",
+        "description": "Used by worker to report progress, completed stems, or failure details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJobStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Audio job updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioJobResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{id}/simulate": {
+      "post": {
+        "summary": "Simulate job execution",
+        "description": "Triggers background progress simulation for testing.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Simulation triggered"
+          }
+        }
+      }
+    },
+    "/api/files/stems/{jobId}/{stemName}": {
+      "get": {
+        "summary": "Stream or download stem audio file",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "stemName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audio file stream",
+            "content": {
+              "audio/wav": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/files/uploads/{filename}": {
+      "get": {
+        "summary": "Stream original uploaded audio file",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Uploaded audio stream"
+          }
+        }
+      }
+    },
+    "/api/music-box/tracks": {
+      "get": {
+        "summary": "List all Music Box tracks",
+        "description": "Returns independent library audio tracks with titles, covers, and stream URLs.",
+        "responses": {
+          "200": {
+            "description": "List of Music Box tracks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MusicBoxTrackResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/files/music/{filename}": {
+      "get": {
+        "summary": "Stream music audio file",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Music audio stream"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MusicBoxTrackResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "artist": { "type": "string" },
+          "album": { "type": "string" },
+          "durationSeconds": { "type": "integer" },
+          "fileName": { "type": "string" },
+          "audioUrl": { "type": "string" },
+          "coverUrl": { "type": "string" },
+          "genre": { "type": "string" },
+          "fileSizeBytes": { "type": "integer" },
+          "format": { "type": "string" }
+        }
+      },
+      "AudioJobStatus": {
+        "type": "string",
+        "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"]
+      },
+      "CreateJobRequest": {
+        "type": "object",
+        "properties": {
+          "originalFilename": {
+            "type": "string"
+          },
+          "inputFileUrl": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "modelName": {
+            "type": "string",
+            "default": "htdemucs"
+          },
+          "stemCount": {
+            "type": "integer",
+            "default": 4
+          }
+        },
+        "required": ["originalFilename"]
+      },
+      "UpdateJobStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/AudioJobStatus"
+          },
+          "vocalsUrl": {
+            "type": "string"
+          },
+          "drumsUrl": {
+            "type": "string"
+          },
+          "bassUrl": {
+            "type": "string"
+          },
+          "otherUrl": {
+            "type": "string"
+          },
+          "guitarUrl": {
+            "type": "string"
+          },
+          "pianoUrl": {
+            "type": "string"
+          },
+          "instrumentalUrl": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "AudioJobResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalFilename": {
+            "type": "string"
+          },
+          "inputFileUrl": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AudioJobStatus"
+          },
+          "modelName": {
+            "type": "string"
+          },
+          "stemCount": {
+            "type": "integer"
+          },
+          "vocalsUrl": {
+            "type": "string"
+          },
+          "drumsUrl": {
+            "type": "string"
+          },
+          "bassUrl": {
+            "type": "string"
+          },
+          "otherUrl": {
+            "type": "string"
+          },
+          "guitarUrl": {
+            "type": "string"
+          },
+          "pianoUrl": {
+            "type": "string"
+          },
+          "instrumentalUrl": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "originalFilename", "inputFileUrl", "status", "createdAt", "updatedAt"]
+      }
+    }
+  }
+}

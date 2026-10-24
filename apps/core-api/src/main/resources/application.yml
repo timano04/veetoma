@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: veetoma-core-api
+    
+  datasource:
+    # Neon PostgreSQL connection string using -pooler (PgBouncer transaction mode) and SSL enforcement
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-young-water-aoq49yto-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_J0nveU6wqrMN}
+    driver-class-name: org.postgresql.Driver
+    
+    # HikariCP connection pool optimization for Serverless Database environments
+    hikari:
+      minimum-idle: 0
+      idle-timeout: 120000
+      connection-timeout: 30000
+
+  jpa:
+    # ARCHITECTURAL INVARIANT: Enforce schema validation via Flyway, disable auto-DDL generation
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8080
+
+veetoma:
+  storage:
+    base-dir: ${STORAGE_BASE_DIR:d:/veetoma/storage}
+  modal:
+    endpoint-url: ${MODAL_ENDPOINT_URL:https://timano4--veetoma-demucs-worker-demucsworker-api-separate.us-east.modal.run}
+    enabled: ${MODAL_ENABLED:true}
+    timeout-seconds: ${MODAL_TIMEOUT_SECONDS:300}
+  worker:
+    python-bin: ${PYTHON_BIN:py -3.11}
+    script-dir: ${WORKER_SCRIPT_DIR:d:/veetoma/apps/ai-worker}
+    use-demucs: ${USE_DEMUCS:true}
+    api-url: ${CORE_API_URL:http://localhost:8080/api/jobs}
+    base-server-url: ${BASE_SERVER_URL:http://localhost:8080}
+    fallback-to-local: ${FALLBACK_TO_LOCAL:true}

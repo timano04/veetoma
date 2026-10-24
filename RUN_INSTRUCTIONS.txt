@@ -1,0 +1,38 @@
+================================================================================
+                    VEETOMA - HOW TO RUN THE PROJECT
+================================================================================
+
+ALL-IN-ONE STARTER:
+Simply run or double-click "run_all.bat" in this directory:
+- It automatically opens the Core API (Spring Boot on port 8080)
+- It automatically opens the Web App (Next.js on port 3000)
+- Everything is contained in run_all.bat itself (no other scripts needed).
+
+Wait ~10 seconds for Spring Boot to start, then open in your browser:
+  http://localhost:3000
+
+--------------------------------------------------------------------------------
+MANUAL TERMINAL RUNNERS (OPTIONAL):
+--------------------------------------------------------------------------------
+1. Core API (Backend):
+   cd d:\veetoma\apps\core-api
+   $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.11.10-hotspot"
+   mvn spring-boot:run
+
+2. Web App (Frontend):
+   cd d:\veetoma\apps\web
+   npm run dev
+
+--------------------------------------------------------------------------------
+URLS:
+--------------------------------------------------------------------------------
+- Music Box     : http://localhost:3000/box
+- AI Stem Studio: http://localhost:3000/stem
+
+--------------------------------------------------------------------------------
+TROUBLESHOOTING:
+--------------------------------------------------------------------------------
+If ports 8080 or 3000 are already in use:
+  netstat -ano | findstr ":8080 :3000"
+  taskkill /F /PID <PID>
+================================================================================
